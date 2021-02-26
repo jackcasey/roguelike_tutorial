@@ -4,7 +4,6 @@ import copy
 
 from engine import Engine
 import entity_factories
-from input_handlers import EventHandler
 
 def main() -> None:
     screen_width = 80
