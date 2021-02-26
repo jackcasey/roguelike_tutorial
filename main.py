@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import tcod
+import copy
 
 from engine import Engine
-from entity import Entity
+import entity_factories
 from input_handlers import EventHandler
 
 def main() -> None:
@@ -15,11 +16,9 @@ def main() -> None:
     )
     event_handler = EventHandler()
 
-    player = Entity(int(screen_width / 2), int(screen_height / 2), "@", (255, 255, 255))
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), "&", (255, 200, 0))
-    entities = {npc, player}
+    player = copy.deepcopy(entity_factories.player)
 
-    engine = Engine(entities=entities, event_handler=event_handler, player=player)
+    engine = Engine(event_handler=event_handler, player=player)
 
     with tcod.context.new_terminal(
         screen_width,
