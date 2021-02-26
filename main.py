@@ -10,15 +10,12 @@ def main() -> None:
     screen_width = 80
     screen_height = 50
 
-
     tileset = tcod.tileset.load_tilesheet(
         "dejavu10x10_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD
     )
-    event_handler = EventHandler()
-
     player = copy.deepcopy(entity_factories.player)
 
-    engine = Engine(event_handler=event_handler, player=player)
+    engine = Engine(player=player)
 
     with tcod.context.new_terminal(
         screen_width,
@@ -31,8 +28,7 @@ def main() -> None:
 
         while True:
             engine.render(console=root_console, context=context)
-            events = tcod.event.wait()
-            engine.handle_events(events)
+            engine.event_handler.handle_events()
 
 if __name__ == "__main__":
     main()
