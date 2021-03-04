@@ -2,6 +2,7 @@
 import tcod
 import copy
 
+import color
 from engine import Engine
 import entity_factories
 
@@ -16,6 +17,10 @@ def main() -> None:
 
     engine = Engine(player=player)
 
+    engine.message_log.add_message(
+        "Hello and welcome, adventurer, to yet another dungeon!", color.welcome_text
+    )
+
     with tcod.context.new_terminal(
         screen_width,
         screen_height,
@@ -26,8 +31,10 @@ def main() -> None:
         root_console = tcod.Console(screen_width, screen_height, order="F")
 
         while True:
-            engine.render(console=root_console, context=context)
-            engine.event_handler.handle_events()
+            root_console.clear()
+            engine.event_handler.on_render(console=root_console)
+            context.present(root_console)
+            engine.event_handler.handle_events(context)
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,9 @@ from tcod.console import Console
 from tcod.map import compute_fov
 
 from input_handlers import MainGameEventHandler
+from message_log import MessageLog
 from procgen import generate_default_dungeon
+from render_functions import render_bar, render_names_at_mouse_location
 
 if TYPE_CHECKING:
     from entity import Actor
@@ -17,9 +19,11 @@ if TYPE_CHECKING:
 class Engine:
     def __init__(self, player: Actor):
         self.event_handler: EventHandler = MainGameEventHandler(self)
+        self.message_log =  MessageLog()
+        self.mouse_location = (0, 0)
         self.player = player
         self.map_width = 80
-        self.map_height = 50
+        self.map_height = 43
         self.game_map: GameMap = None
 
         self.build_map()
@@ -31,6 +35,10 @@ class Engine:
             engine=self
         )
         self.set_game_map(game_map)
+        self.update_fov()
+
+    def on_action(self):
+        self.handle_enemy_turns()
         self.update_fov()
 
     def set_game_map(self, new_game_map: GameMap):
@@ -52,14 +60,16 @@ class Engine:
         # If a tile is "visible" it should be added to "explored".
         self.game_map.explored |= self.game_map.visible
 
-    def render(self, console: Console, context: Context) -> None:
+    def render(self, console: Console) -> None:
         self.game_map.render(console)
 
-        console.print(
-            x=1,
-            y=47,
-            string=f"HP: {self.player.fighter.hp}/{self.player.fighter.max_hp}",
-        )
-        context.present(console)
+        self.message_log.render(console=console, x=21, y=45, width=40, height=5)
 
-        console.clear
+        render_bar(
+            console=console,
+            current_value=self.player.fighter.hp,
+            maximum_value=self.player.fighter.max_hp,
+            total_width=20,
+        )
+
+        render_names_at_mouse_location(console=console, x=21, y=44, engine=self)
